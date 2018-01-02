@@ -19,6 +19,16 @@ class Buffer
       @vim.normal 'gg=G'
       # save the changes
       sleep 0.1 if ENV['CI']
+      sleep_until_indented
+    end
+  end
+
+  def sleep_until_indented
+    start = Time.now
+    timeout = 10
+    loop do
+      break if Time.now - start > timeout
+      break if IO.read(@file).each_line.any? {|line| line[0] == " "}
     end
   end
 
@@ -94,7 +104,7 @@ class Differ
       object_preparer: -> (object) do
         RSpec::Matchers::Composable.surface_descriptions_in(object)
       end,
-      color: RSpec::Matchers.configuration.color?
+      color: true #RSpec::Matchers.configuration.color?
     )
   end
 
@@ -119,8 +129,11 @@ RSpec::Matchers.define :be_typed_with_right_indent do |syntax|
   buffer = Buffer.new(VIM, syntax || :ex)
 
   match do |code|
-    @typed = buffer.type(code)
-    @typed == code
+    # Comments will cause the rest of the code to be commented
+    # when typed so we remove them
+    @without_comments = code.each_line.map { |line| line.sub(/\s*#[^{].*$/, "") }.delete_if { |line| line == "\n" }.join
+    @typed = buffer.type(@without_comments)
+    @typed == @without_comments
   end
 
   failure_message do |code|
@@ -130,7 +143,11 @@ RSpec::Matchers.define :be_typed_with_right_indent do |syntax|
       #{@typed}
       to be indented as
 
-      #{code}
+      #{@without_comments}
+
+      Diff:
+
+      #{Differ.diff(@typed, @without_comments)}
       EOM
   end
 end
@@ -148,13 +165,19 @@ end
     end
 
     failure_message do |code|
+      reindented = buffer.reindent(code)
+
       <<~EOM
       Expected
 
-      #{buffer.reindent(code)}
+      #{reindented}
       to be indented as
 
       #{code}
+
+      Diff:
+
+      #{Differ.diff(reindented, code)}
       EOM
     end
   end

@@ -1,2 +1,5 @@
 profile.log
 test_indent.result
+elixir/
+tmp/
+.rspec

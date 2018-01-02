@@ -11,5 +11,6 @@ setlocal indentkeys+=*<Return>,=->,=\|>,=<>,0},0],0)
 " TODO: @jbodah 2017-02-27: all operators should cause reindent when typed
 
 function! elixir#indent(lnum)
+  let _move = cursor(a:lnum, 1)
   return elixir#indent#indent(a:lnum)
 endfunction

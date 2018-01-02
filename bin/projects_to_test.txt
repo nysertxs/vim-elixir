@@ -6,3 +6,4 @@ wistia/http_monitor
 wistia/impersonate_ex
 wistia/m3u8_parser
 wistia/simple_http_server
+elixir-lang/elixir

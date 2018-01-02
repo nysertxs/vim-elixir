@@ -1,4 +1,11 @@
 #! /usr/bin/env ruby
+
+# A utility for testing vim-elixir. Requires gvim or macvim. This utility will
+# spawn a new gvim session for you with a blank vimcrc. It will then load
+# vim-elixir and enable indent debug mode. The ruler and line number will both
+# be set, and <C-R> is bound to the `Reload` function which will reload vim-elixir's
+# indent code. Finally, a fresh buffer will be opened for you to play around.
+
 require 'bundler/setup'
 require 'vimrunner'
 dir = File.expand_path('..', __dir__)
@@ -6,6 +13,10 @@ plugin = 'ftdetect/elixir.vim'
 vim = Vimrunner.start_gvim
 vim.add_plugin(dir, plugin)
 vim.normal ":let g:elixir_indent_debug=1<CR>"
+vim.normal ":set ruler<CR>"
+vim.normal ":set number<CR>"
+vim.normal ":function! Reload()<CR>echom 'Reloading'<CR>so autoload/elixir/indent.vim<CR>endfunction<CR>"
+vim.normal ":nnoremap <<C-R> C-R> :call Reload()<<C-R> CR><CR>"
 vim.edit! "test.ex"
 vim.normal
 
