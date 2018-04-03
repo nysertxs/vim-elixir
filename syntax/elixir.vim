@@ -115,7 +115,7 @@ else
   syn cluster elixirDocStringContained contains=elixirDocTest,elixirTodo,@Spell,elixirInterpolation
 
   " doctests
-  syn region elixirDocTest start="^\s*\%(iex\|\.\.\.\)\%((\d*)\)\?>\s" end="^\s*$" contained
+  syn region elixirDocTest start="^\s*\%(\.\.\.\)\%((\d*)\)\?>\s" end="^\s*$" contained
 endif
 
 syn region elixirDocString matchgroup=elixirSigilDelimiter  start="\%(@\w*doc\s\+\)\@<=\~[Ss]\z(/\|\"\|'\||\)" end="\z1" skip="\\\\\|\\\z1" contains=@elixirDocStringContained fold keepend
